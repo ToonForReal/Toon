@@ -16,7 +16,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 
 const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
-camera.position.set(0, 2, -8);
+camera.position.set(-1, 7, -8);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
@@ -27,11 +27,11 @@ document.body.appendChild(renderer.domElement);
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 // ------------------ Lights ------------------
-const hemi = new THREE.HemisphereLight(0xffffff, 0x333333, 0.6);
+const hemi = new THREE.HemisphereLight(0xffffff, 0x333333, 1);
 scene.add(hemi);
 
 const dir = new THREE.DirectionalLight(0xffffff, 1.0);
-dir.position.set(0, 5,-10);
+dir.position.set(2, 2,-10);
 dir.castShadow = true;
 scene.add(dir);
 
@@ -114,12 +114,57 @@ function scaleModel(model, scale = {x:1, y:1, z:1}) {
 }
 
 // ------------------ เรียกใช้งานฟังก์ชัน ------------------
-loadGLB('https://toonforreal.github.io/Toon/real-time_reflection_demo_chess_board_by_al.glb', {x:-0.3, y:2.04, z:-0.8}, (model) => {
-    scaleModel(model, {x:0.05, y:0.05, z:0.05});});
-loadGLB('https://toonforreal.github.io/Toon/garden_table_and_chair.glb', {x:0, y:1.5, z:0}, (model) => {
-    scaleModel(model, {x:2.5, y:2.5, z:2.5});});
- loadGLB('https://toonforreal.github.io/Toon/name_2.glb', {x:0, y:1.8, z:2}, (model) => {
-     scaleModel(model, {x:0.35, y:0.35, z:0.35});});
+loadGLB(
+  'https://toonforreal.github.io/Toon/real-time_reflection_demo_chess_board_by_al.glb',
+  { x: -0.6, y: 4, z: -1.6 },
+  (model) => {
+    scaleModel(model, { x: 0.1, y: 0.1, z: 0.1 });
+
+    // 🎨 เปลี่ยนวัสดุเป็น PBR
+    model.traverse((node) => {
+      if (node.isMesh) {
+        const oldMat = node.material;
+        node.material = new THREE.MeshStandardMaterial({
+          map: oldMat.map || null,
+          normalMap: oldMat.normalMap || null,
+          roughnessMap: oldMat.roughnessMap || null,
+          metalnessMap: oldMat.metalnessMap || null,
+          color: oldMat.color || new THREE.Color(0xffffff),
+          roughness: 0,         // ผิวค่อนข้างมัน
+          metalness: 1,         // เงาแบบโลหะ
+          envMap: cubeTexture,    // ใช้แสงจาก environment
+          envMapIntensity: 4.0    // เพิ่มความสะท้อน
+        });
+        node.material.needsUpdate = true;
+      }
+    });
+  }
+);
+loadGLB('https://toonforreal.github.io/Toon/garden_table_and_chair.glb',
+    {x:0, y:3, z:0}, (model) => {
+    scaleModel(model, {x:5, y:5, z:5});
+    // 🎨 เปลี่ยนวัสดุเป็น PBR
+    model.traverse((node) => {
+      if (node.isMesh) {
+        const oldMat = node.material;
+        node.material = new THREE.MeshStandardMaterial({
+          map: oldMat.map || null,
+          normalMap: oldMat.normalMap || null,
+          roughnessMap: oldMat.roughnessMap || null,
+          metalnessMap: oldMat.metalnessMap || null,
+          color: oldMat.color || new THREE.Color(0xffffff),
+          roughness: 2,         // ผิวค่อนข้างมัน
+          metalness: 0,         // เงาแบบโลหะ
+          envMap: cubeTexture,    // ใช้แสงจาก environment
+          envMapIntensity: 1    // เพิ่มความสะท้อน
+        });
+        node.material.needsUpdate = true;
+      }
+    });
+});
+
+ loadGLB('https://toonforreal.github.io/Toon/name__2.glb', {x:0, y:3.6, z:2}, (model) => {
+     scaleModel(model, {x:0.7, y:0.7, z:0.7});});
   
 
 // ------------------ Resize ------------------
@@ -134,9 +179,9 @@ let penguinModel_1 = null;
 let penguinModel_2 = null;
 
 loadGLB('https://toonforreal.github.io/Toon/penguin_2.0.glb',
-  {x:-0.8, y:1.8, z:-0.5},
+  {x:-1.5, y:4.3, z:-0.1},
   (model) => {
-    scaleModel(model, {x:0.01, y:0.01, z:0.01});
+    scaleModel(model, {x:0.02, y:0.02, z:0.02});
      const gradient = new THREE.TextureLoader().load('https://toonforreal.github.io/Toon/penguin_2.0.glbradient.png');
   model.traverse((node) => {
     if (node.isMesh) {
@@ -152,9 +197,9 @@ loadGLB('https://toonforreal.github.io/Toon/penguin_2.0.glb',
   });
 
 loadGLB('https://toonforreal.github.io/Toon/penguin_2.0.glb',
-  {x:-0.8, y:1.8, z:-0.2},
+  {x:-1.5, y:3.6, z:-1},
   (model) => {
-    scaleModel(model, {x:0.01, y:0.01, z:0.01});
+    scaleModel(model, {x:0.02, y:0.02, z:0.02});
     const gradient = new THREE.TextureLoader().load('https://toonforreal.github.io/Toon/penguin_2.0.glbradient.png');
   model.traverse((node) => {
     if (node.isMesh) {
@@ -177,9 +222,9 @@ loadGLB('https://toonforreal.github.io/Toon/penguin_2.0.glb',
   // ให้เพนกวินกระดิกตัว 2
   if (penguinModel_2) {
     penguinModel_2.rotation.y -= 0.01;
-    penguinModel_2.position.y = 1.8 + Math.sin(Date.now() * 0.01) * 0.1;
-    if(penguinModel_2.position.y < 1.8){
-        penguinModel_2.position.y = 1.8;        
+    penguinModel_2.position.y = 3.6 + Math.sin(Date.now() * 0.01) * 0.1;
+    if(penguinModel_2.position.y < 3.6){
+        penguinModel_2.position.y = 3.6;        
     }
   }
   renderer.render(scene, camera);
@@ -193,9 +238,9 @@ loadGLB('https://toonforreal.github.io/Toon/penguin_2.0.glb',
   // ให้เพนกวินกระดิกตัว 1
   if (penguinModel_1) {
     penguinModel_1.rotation.y += 0.01;
-    penguinModel_1.position.y = 1.8 + Math.sin(Date.now() * 0.01) * 0.1;
-    if(penguinModel_1.position.y < 1.8){
-        penguinModel_1.position.y = 1.8;        
+    penguinModel_1.position.y = 3.6 + Math.sin(Date.now() * 0.01) * 0.1;
+    if(penguinModel_1.position.y < 3.6){
+        penguinModel_1.position.y = 3.6;        
     }
   }
   renderer.render(scene, camera);
